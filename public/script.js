@@ -1,9 +1,9 @@
-// ── State ──────────────────────────────────────────────────────────────────
-// 'en|ru' = English → Russian,  'ru|en' = Russian → English
+// ââ State ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// 'en|ru' = English â Russian,  'ru|en' = Russian â English
 let currentDirection = 'en|ru';
 let lastTranslation = ''; // stores the most recent translated text
 
-// ── DOM References ─────────────────────────────────────────────────────────
+// ââ DOM References âââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const sourceText      = document.getElementById('source-text');
 const translationOut  = document.getElementById('translation-output');
 const translateBtn    = document.getElementById('translate-btn');
@@ -21,16 +21,16 @@ const clearHistoryBtn = document.getElementById('clear-history-btn');
 const labelSource     = document.getElementById('label-source');
 const labelTarget     = document.getElementById('label-target');
 
-// ── Language Helpers ───────────────────────────────────────────────────────
+// ââ Language Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const LANG_NAMES = { en: 'English', ru: 'Russian' };
 
-// Maps language code → BCP-47 tag used by Web Speech API
+// Maps language code â BCP-47 tag used by Web Speech API
 const SPEECH_LANG = { en: 'en-US', ru: 'ru-RU' };
 
 function sourceLang() { return currentDirection.split('|')[0]; }
 function targetLang() { return currentDirection.split('|')[1]; }
 
-// ── Direction Toggle ───────────────────────────────────────────────────────
+// ââ Direction Toggle âââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function setDirection(dir) {
   currentDirection = dir;
   const [src, tgt] = dir.split('|');
@@ -44,7 +44,7 @@ function setDirection(dir) {
   labelTarget.textContent = LANG_NAMES[tgt];
 
   // Update textarea placeholder
-  sourceText.placeholder = `Type your ${LANG_NAMES[src]} text here…`;
+  sourceText.placeholder = `Type your ${LANG_NAMES[src]} text hereâ¦`;
 
   // Clear output when direction changes
   clearOutput();
@@ -67,14 +67,14 @@ btnSwap.addEventListener('click', () => {
   setDirection(newDir);
 });
 
-// ── Character Counter ──────────────────────────────────────────────────────
+// ââ Character Counter ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 sourceText.addEventListener('input', updateCharCount);
 
 function updateCharCount() {
   charCount.textContent = sourceText.value.length;
 }
 
-// ── Translation ────────────────────────────────────────────────────────────
+// ââ Translation ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 translateBtn.addEventListener('click', translate);
 
 // Allow Ctrl+Enter to translate
@@ -92,13 +92,13 @@ async function translate() {
 
   // Show loading state
   translateBtn.disabled = true;
-  translateBtn.textContent = 'Translating…';
-  translationOut.innerHTML = '<span class="spinner"></span> Fetching translation…';
+  translateBtn.textContent = 'Translatingâ¦';
+  translationOut.innerHTML = '<span class="spinner"></span> Fetching translationâ¦';
   status.textContent = '';
   lastTranslation = '';
 
   try {
-    // MyMemory API — free, no key required
+    // MyMemory API â free, no key required
     // langpair format: "en|ru"
     const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${currentDirection}`;
     const response = await fetch(url);
@@ -112,12 +112,27 @@ async function translate() {
       throw new Error(data.responseMessage || 'Translation failed');
     }
 
-    const translated = data.responseData.translatedText;
+    let translated = data.responseData.translatedText;
+
+    // If the top result isn't in the target script, scan matches for a better one
+    if (targetLang() === 'ru' && !/[\u0400-\u04FF]/.test(translated)) {
+      const better = (data.matches || [])
+        .filter(m => /[\u0400-\u04FF]/.test(m.translation))
+        .sort((a, b) => b.quality - a.quality)[0];
+      if (better) translated = better.translation;
+    }
+    if (targetLang() === 'en' && /[\u0400-\u04FF]/.test(translated)) {
+      const better = (data.matches || [])
+        .filter(m => !/[\u0400-\u04FF]/.test(m.translation))
+        .sort((a, b) => b.quality - a.quality)[0];
+      if (better) translated = better.translation;
+    }
+
     lastTranslation = translated;
 
     // Display result
     translationOut.textContent = translated;
-    showStatus('✓ Translated', false);
+    showStatus('â Translated', false);
 
     // Save to history
     saveToHistory(text, translated, currentDirection);
@@ -137,12 +152,12 @@ function showStatus(msg, isError) {
 }
 
 function clearOutput() {
-  translationOut.innerHTML = '<span class="placeholder-text">Translation will appear here…</span>';
+  translationOut.innerHTML = '<span class="placeholder-text">Translation will appear hereâ¦</span>';
   status.textContent = '';
   lastTranslation = '';
 }
 
-// ── Clear button ───────────────────────────────────────────────────────────
+// ââ Clear button âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 clearBtn.addEventListener('click', () => {
   sourceText.value = '';
   updateCharCount();
@@ -150,7 +165,7 @@ clearBtn.addEventListener('click', () => {
   sourceText.focus();
 });
 
-// ── Pronunciation (Web Speech API) ────────────────────────────────────────
+// ââ Pronunciation (Web Speech API) ââââââââââââââââââââââââââââââââââââââââ
 function speak(text, lang) {
   if (!text || !('speechSynthesis' in window)) {
     alert('Sorry, your browser does not support text-to-speech.');
@@ -161,7 +176,7 @@ function speak(text, lang) {
 
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.lang = SPEECH_LANG[lang] || lang;
-  utterance.rate = 0.9; // slightly slower — better for learners
+  utterance.rate = 0.9; // slightly slower â better for learners
   window.speechSynthesis.speak(utterance);
 }
 
@@ -173,7 +188,7 @@ speakTarget.addEventListener('click', () => {
   speak(lastTranslation, targetLang());
 });
 
-// ── History ────────────────────────────────────────────────────────────────
+// ââ History ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 const HISTORY_KEY = 'ruslearn_history';
 const MAX_HISTORY = 50; // keep last 50 entries
 
@@ -230,7 +245,7 @@ function renderHistory() {
     card.dataset.id = entry.id;
 
     const timeStr = formatTime(entry.time);
-    const dirLabel = `${LANG_NAMES[src].slice(0,2)} → ${LANG_NAMES[tgt].slice(0,2)}`;
+    const dirLabel = `${LANG_NAMES[src].slice(0,2)} â ${LANG_NAMES[tgt].slice(0,2)}`;
 
     card.innerHTML = `
       <div class="history-source">${escapeHtml(entry.source)}</div>
@@ -238,7 +253,7 @@ function renderHistory() {
       <div class="history-meta">
         <span class="history-direction">${dirLabel}</span>
         <span class="history-time">${timeStr}</span>
-        <button class="history-speak" data-text="${escapeAttr(entry.target)}" data-lang="${tgt}" title="Hear translation">🔊</button>
+        <button class="history-speak" data-text="${escapeAttr(entry.target)}" data-lang="${tgt}" title="Hear translation">ð</button>
       </div>
     `;
 
@@ -260,11 +275,11 @@ clearHistoryBtn.addEventListener('click', () => {
   }
 });
 
-// ── Helpers ────────────────────────────────────────────────────────────────
+// ââ Helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 function formatTime(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
-    + ' · '
+    + ' Â· '
     + d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 }
 
@@ -281,6 +296,6 @@ function escapeAttr(str) {
   return str.replace(/"/g, '&quot;');
 }
 
-// ── Init ───────────────────────────────────────────────────────────────────
+// ââ Init âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 setDirection('en|ru');   // set up labels and placeholder on load
 renderHistory();          // render any saved history from localStorage
