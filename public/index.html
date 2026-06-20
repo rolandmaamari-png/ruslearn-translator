@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RusLearn Translator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── Header ── -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-icon">🇷🇺</span>
+        <span class="logo-text">RusLearn</span>
+      </div>
+      <p class="tagline">English ↔ Russian Translator for Students</p>
+    </div>
+  </header>
+
+  <!-- ── Main translator card ── -->
+  <main>
+    <div class="card translator-card">
+
+      <!-- Language direction toggle -->
+      <div class="direction-bar">
+        <button class="lang-btn active" id="btn-en-ru">🇬🇧 English → 🇷🇺 Russian</button>
+        <button class="swap-btn" id="btn-swap" title="Swap languages">⇄</button>
+        <button class="lang-btn" id="btn-ru-en">🇷🇺 Russian → 🇬🇧 English</button>
+      </div>
+
+      <!-- Input area -->
+      <div class="panels">
+        <div class="panel">
+          <label class="panel-label" id="label-source">English</label>
+          <textarea
+            id="source-text"
+            placeholder="Type your text here…"
+            rows="5"
+            maxlength="500"
+          ></textarea>
+          <div class="panel-footer">
+            <span class="char-count"><span id="char-count">0</span> / 500</span>
+            <button class="speak-btn" id="speak-source" title="Hear pronunciation">🔊</button>
+          </div>
+        </div>
+
+        <!-- Output area -->
+        <div class="panel output-panel">
+          <label class="panel-label" id="label-target">Russian</label>
+          <div id="translation-output" class="translation-output">
+            <span class="placeholder-text">Translation will appear here…</span>
+          </div>
+          <div class="panel-footer">
+            <span id="translation-status"></span>
+            <button class="speak-btn" id="speak-target" title="Hear pronunciation">🔊</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Translate button -->
+      <div class="action-bar">
+        <button class="translate-btn" id="translate-btn">Translate</button>
+        <button class="clear-btn" id="clear-btn">Clear</button>
+      </div>
+
+    </div>
+
+    <!-- ── History section ── -->
+    <div class="history-header">
+      <h2>Translation History</h2>
+      <button class="clear-history-btn" id="clear-history-btn">Clear History</button>
+    </div>
+
+    <div id="history-list" class="history-list">
+      <!-- History cards injected by script.js -->
+      <p class="empty-history" id="empty-history">No translations yet. Start translating!</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Powered by <a href="https://mymemory.translated.net" target="_blank">MyMemory API</a> · Built for Russian learners</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

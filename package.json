@@ -1,0 +1,12 @@
+{
+  "name": "ruslearn-translator",
+  "version": "1.0.0",
+  "description": "English ↔ Russian translator for students learning Russian",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
